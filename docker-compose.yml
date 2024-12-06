@@ -1,0 +1,30 @@
+services:
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    ports:
+      - "8000:8000"
+    depends_on:
+      - cassandra
+    environment:
+      - CASSANDRA_HOST=cassandra
+      - CASSANDRA_PORT=9042
+    command: python app/main.py
+
+  cassandra:
+    image: cassandra:latest
+    container_name: cassandra
+    ports:
+      - "9042:9042"
+    volumes:
+      - cassandra_data:/var/lib/cassandra
+      - ./init-cql:/docker-entrypoint-initdb.d
+    environment:
+      CASSANDRA_CLUSTER_NAME: "TestCluster"
+      CASSANDRA_NUM_TOKENS: "256"
+      CASSANDRA_RPC_ADDRESS: "0.0.0.0"
+      CASSANDRA_START_RPC: "true"
+
+volumes:
+  cassandra_data:
