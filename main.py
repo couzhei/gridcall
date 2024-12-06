@@ -35,6 +35,8 @@ app = FastAPI()
 # Connect to Cassandra
 cluster = Cluster(["127.0.0.1"], port=9042)
 session = cluster.connect("my_keyspace")
+session.set_keyspace("my_keyspace")
+
 
 # Prepared statements
 insert_stmt = session.prepare("INSERT INTO cells (x, y, json_data) VALUES (?, ?, ?)")

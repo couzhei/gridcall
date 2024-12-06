@@ -6,6 +6,7 @@ WORKDIR /app
 
 # Copy requirements and install dependencies
 COPY requirements.txt .
+
 RUN pip install --no-cache-dir -r requirements.txt
 
 # Copy application code
@@ -14,5 +15,6 @@ COPY app/ .
 # Expose the port FastAPI will run on
 EXPOSE 8000
 
-# Start FastAPI
-CMD ["python", "main.py"]
+# Start FastAPIdocke
+#CMD ["python", "main.py"]
+CMD [ "python", "main.py"]

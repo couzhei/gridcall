@@ -1,14 +1,16 @@
 from fastapi import FastAPI, HTTPException, Request
 from cassandra.cluster import Cluster
-from cassandra.query import SimpleStatement
+
+# from cassandra.query import SimpleStatement
 from typing import List
 from pydantic import BaseModel
 from starlette.middleware.base import BaseHTTPMiddleware
 import logging
-import json
 
-
+# import json
 import uvicorn
+import os
+import time
 
 
 # Set up logging
@@ -32,9 +34,19 @@ class LogRequestMiddleware(BaseHTTPMiddleware):
 
 app = FastAPI()
 
-# Connect to Cassandra
-cluster = Cluster(["127.0.0.1"], port=9042)
-session = cluster.connect("my_keyspace")
+cassandra_host = os.getenv("CASSANDRA_HOST", "localhost")
+cassandra_port = int(os.getenv("CASSANDRA_PORT", 9042))
+
+for i in range(3):
+    try:
+        # Connect to Cassandra
+        cluster = Cluster([cassandra_host], port=cassandra_port)
+        session = cluster.connect("my_keyspace")
+        break
+    except:
+        time.sleep(10)
+        continue
+
 
 # Prepared statements
 insert_stmt = session.prepare("INSERT INTO cells (x, y, json_data) VALUES (?, ?, ?)")
@@ -112,8 +124,9 @@ if __name__ == "__main__":
         app,
         host="0.0.0.0",
         port=8000,
-        ssl_keyfile="key.pem",
+        ssl_keyfile_password="fuck",
         ssl_certfile="cert.pem",
+        ssl_keyfile="key.pem",
         log_level="info",
         # reload=True,
         # debug=True, # not working
